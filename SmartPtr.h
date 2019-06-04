@@ -1,6 +1,8 @@
 #ifndef SMARTPTR
 #define SMARTPTR
 
+#include <iostream>
+
 template <class T>
 class SmartPtr
 {

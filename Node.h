@@ -22,20 +22,32 @@ private:
     Node(){};
 
 public:
-    Node(int x, int y, unsigned esti, unsigned actu) : _point(x, y), _estimatedCost(esti), _actualCost(actu), _previousNode(nullptr){};
     Node(const Node &n) : _point(n.GetPoint().X, n.GetPoint().Y), _estimatedCost(n._estimatedCost), _actualCost(n._actualCost), _previousNode(n.GetPreviousNode()){};
-    Node(int x, int y, Node *current, const Node &goal) : _point(x, y)
+    Node(const int &x, const int &y, Node *const current, const Node *const goal) : _point(x, y)
     {
-        int estX = goal.GetPoint().X - x;
-        int estY = goal.GetPoint().Y - y;
-        _estimatedCost = estX * estX + estY * estY;
-
-        if(current->GetPreviousNode()) _actualCost = current->GetPreviousNode()->_actualCost + 1;
-        else _actualCost = 0;
-        _previousNode = &(*current);
+        if (goal)
+        {
+            int estX = goal->GetPoint().X - x;
+            int estY = goal->GetPoint().Y - y;
+            _estimatedCost = estX * estX + estY * estY;
+        }
+        else
+        {
+            _estimatedCost = 0;
+        }
+        
+        if (current)
+        {
+            _actualCost = current->_actualCost + 1;
+            _previousNode = current;
+        }
+        else{
+            _actualCost = 0;
+            _previousNode = nullptr;
+        }
     };
 
-    ~Node(){ _previousNode = nullptr; std::cout << "Destroy" << std::endl;};//std::cout << _point.X << " " << _point.Y << std::endl; std::cout << "Destroy" << std::endl;}
+    ~Node(){ _previousNode = nullptr;};
     inline unsigned GetScore(){ return _estimatedCost + _actualCost; }
     inline Point GetPoint() const {return _point;}
     inline Node *GetPreviousNode() const {return _previousNode;}

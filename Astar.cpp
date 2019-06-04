@@ -2,7 +2,6 @@
 #include <vector>
 #include <algorithm>
 #include "Node.h"
-//#include "SmartPtr.h"
 
 using std::cout;
 using std::endl;
@@ -34,15 +33,16 @@ Point GetAdjacentNodeIndex(const Point &point, const int &dir)
     }
 }
 
-const int mapX = 4, mapY = 4;
+const int mapX = 5, mapY = 5;
 
 //マップ
 eMapNode Map[mapY][mapX] = 
 {
-    {Floor, Floor, Floor, Floor},
-    {Floor, Floor, Wall, Floor},
-    {Start, Floor, Wall, Goal},
-    {Floor, Wall, Floor, Floor},
+    {Floor, Floor, Floor, Floor, Floor},
+    {Floor, Floor, Wall, Floor, Wall},
+    {Start, Floor, Wall, Floor, Floor},
+    {Floor, Wall, Floor, Wall, Floor},
+    {Floor, Wall, Goal, Floor, Floor},
 };
 
 char GetMapChip(eMapNode node){
@@ -67,8 +67,8 @@ int main(){
     cout << endl;
 
     //スタートとゴールのノード
-    Node *start = new Node(0, 2, 3, 0);
-    Node goal(3, 2, 0, 3);
+    Node goal(2, 4, nullptr, nullptr);
+    Node *start = new Node(0, 2, nullptr, &goal);
     Node *currentNode = start;
 
     vector<Node*> openNodes = {start};
@@ -87,7 +87,7 @@ int main(){
             if(std::find_if(closedNodes.begin(), closedNodes.end(), [pt](Node *n){return n->GetPoint() == pt;}) != closedNodes.end()) continue;
 
             //移動可能ならopenNodesに追加
-            if (Map[pt.Y][pt.X] == eMapNode::Floor || Map[pt.Y][pt.X] == eMapNode::Goal) openNodes.push_back(new Node(pt.X, pt.Y, currentNode, goal));
+            if (Map[pt.Y][pt.X] == eMapNode::Floor || Map[pt.Y][pt.X] == eMapNode::Goal) openNodes.push_back(new Node(pt.X, pt.Y, currentNode, &goal));
         }
 
 
@@ -124,8 +124,10 @@ int main(){
         std::cout << std::endl;
     }
 
-    for(auto &n : openNodes) delete n;
-    for(auto &n : closedNodes) delete n;
+    for(auto &n : openNodes) if(n != nullptr) delete n;
+    for(auto &n : closedNodes) if(n != nullptr) delete n;
+    openNodes.clear();
+    closedNodes.clear();
     
     return 0;
 }
