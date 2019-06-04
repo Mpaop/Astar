@@ -93,6 +93,7 @@ int main(){
 
         //検索済みのノードをクローズする
         closedNodes.push_back(currentNode);
+        Map[currentNode->GetPoint().Y][currentNode->GetPoint().X] = eMapNode::Close;
         int idx;
         for (idx = 0; idx < openNodes.size(); ++idx) if(openNodes[idx]->GetPoint() == currentNode->GetPoint()) break;
         openNodes.erase(openNodes.begin() + idx);
@@ -108,15 +109,19 @@ int main(){
         if(currentNode->GetPoint() == goal.GetPoint()) break;
     }
 
-    //ゴールを保持するため
-    auto tempNode = currentNode;
+    //ゴールをGに変える
+    Map[currentNode->GetPoint().Y][currentNode->GetPoint().X] = eMapNode::Goal;
+    auto tempNode = currentNode->GetPreviousNode();
 
     //探索した経路を描画
-    do{
-        if(Map[tempNode->GetPoint().Y][tempNode->GetPoint().X] == eMapNode::Floor) Map[tempNode->GetPoint().Y][tempNode->GetPoint().X] = eMapNode::Open;
+    while(tempNode->GetPreviousNode()){
+        Map[tempNode->GetPoint().Y][tempNode->GetPoint().X] = eMapNode::Open;
         //次のノードへ
         tempNode = tempNode->GetPreviousNode();
-    }while(tempNode->GetPreviousNode());
+    }
+
+    //スタートはSにする
+    Map[tempNode->GetPoint().Y][tempNode->GetPoint().X] = eMapNode::Start;
 
     //マップの描画
     for(auto &y : Map){
